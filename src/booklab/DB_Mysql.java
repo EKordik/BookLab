@@ -12,10 +12,11 @@ import java.util.*;
  *
  * @author emmakordik
  */
-public class DB_Mysql {
+public class DB_Mysql implements DBAccessor {
     private Connection connection;
     
     
+    @Override
     public void openConnection(String driveName, String url, String username, String password)
             throws IllegalArgumentException, ClassNotFoundException, SQLException {
        if(url == null || url.length() == 0){
@@ -30,11 +31,13 @@ public class DB_Mysql {
     }
 
 
+    @Override
     public void closeConnection() throws SQLException {
         connection.close();
     }
 
 
+    @Override
     public List<Map<String, Object>> getAllRecords(String tablename) throws SQLException, Exception {
         String sql = "SELECT * FROM " + tablename + ";";
         final List<Map<String,Object>> list = new ArrayList<>();
@@ -68,6 +71,7 @@ public class DB_Mysql {
         return list;
     }
     
+    @Override
     public List<Map<String,Object>> getRecordsForOneCriteria(String tablename, String columnName, String searchTerm) throws Exception{
         String sql = "SELECT * FROM " + tablename + " WHERE " + columnName + " = " + searchTerm + ";";
         final List<Map<String,Object>> list = new ArrayList<>();
@@ -83,7 +87,7 @@ public class DB_Mysql {
             final int fields = metadata.getColumnCount();
             while(rs.next()){
                 record = new HashMap();
-                for(int i = 0; i<fields; i++){
+                for(int i = 1; i<fields; i++){
                     record.put(metadata.getColumnName(i), rs.getObject(i));
                 }
                 list.add(record);
@@ -106,7 +110,7 @@ public class DB_Mysql {
         
         db.openConnection(driver, url, username, password);
         //List<Map<String,Object>> records = db.getAllRecords("book");
-        List<Map<String,Object>> records2 = db.getRecordsForOneCriteria("book", "title", "'Advanced Java'");
+        List<Map<String,Object>> records2 = db.getRecordsForOneCriteria("book", "title", "'Tom Sawyer'");
         
         for(Map r: records2){
             Set keySet = r.keySet();
